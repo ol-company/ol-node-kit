@@ -1,0 +1,58 @@
+# CI + phát hành thư viện @ol-company/node-kit lên GitHub Packages.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  ci:
+    uses: ol-company/ol-build-tooling/.github/workflows/node-ci.yml@v1.0.0
+    permissions:
+      contents: read
+      packages: read
+
+  security:
+    uses: ol-company/ol-build-tooling/.github/workflows/security-scan.yml@v1.0.0
+    permissions:
+      contents: read
+      security-events: write
+      packages: read
+      pull-requests: write
+
+  release:
+    if: github.event_name == 'push'
+    needs: [ci, security]
+    uses: ol-company/ol-build-tooling/.github/workflows/release.yml@v1.0.0
+    secrets: inherit
+    permissions:
+      contents: read
+
+  # Chỉ publish khi release-please vừa tạo phiên bản mới (merge release PR)
+  publish:
+    needs: release
+    if: needs.release.outputs.release-created == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write # Ghi package vào GitHub Packages của org
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+      - run: pnpm publish --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
