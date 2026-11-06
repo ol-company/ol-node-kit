@@ -1,6 +1,6 @@
 {
   "name": "@ol-company/node-kit",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Thư viện dùng chung cho service Node.js của OL-Platform: config, log, lỗi, xác thực, phân quyền, health, shutdown, OpenTelemetry",
   "license": "UNLICENSED",
   "type": "module",
