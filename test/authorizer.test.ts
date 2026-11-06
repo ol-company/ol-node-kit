@@ -7,7 +7,11 @@ import {
   type AuthzDecision,
 } from '../src/index.js';
 
-const input = { principal: 'users/u1', permission: 'warehouse.items.list', resource: 'tenants/t1/warehouses/w1' };
+const input = {
+  principal: 'users/u1',
+  permission: 'warehouse.items.list',
+  resource: 'tenants/t1/warehouses/w1',
+};
 const allow: AuthzDecision = { allow: true, reason: 'binding', policyVersion: 1 };
 const deny: AuthzDecision = { allow: false, reason: 'no-binding', policyVersion: 1 };
 
@@ -42,7 +46,9 @@ describe('HttpAuthorizer', () => {
   const tokenProvider = { getToken: vi.fn().mockResolvedValue('svc-token') };
 
   it('gửi đúng hợp đồng và đọc phản hồi', async () => {
-    const fetchImpl = vi.fn().mockResolvedValue(new Response(JSON.stringify(allow), { status: 200 }));
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(new Response(JSON.stringify(allow), { status: 200 }));
     const authz = new HttpAuthorizer({ baseUrl: 'http://iam', tokenProvider, fetchImpl });
     await expect(authz.check(input)).resolves.toEqual(allow);
     const [url, init] = fetchImpl.mock.calls[0]!;
@@ -58,7 +64,9 @@ describe('HttpAuthorizer', () => {
   });
 
   it('từ chối phản hồi sai hợp đồng', async () => {
-    const fetchImpl = vi.fn().mockResolvedValue(new Response(JSON.stringify({ allow: 'yes' }), { status: 200 }));
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValue(new Response(JSON.stringify({ allow: 'yes' }), { status: 200 }));
     const authz = new HttpAuthorizer({ baseUrl: 'http://iam', tokenProvider, fetchImpl });
     await expect(authz.check(input)).rejects.toBeInstanceOf(DependencyUnavailableError);
   });

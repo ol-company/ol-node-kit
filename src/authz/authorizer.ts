@@ -102,7 +102,9 @@ export class CachingAuthorizer implements Authorizer {
     } catch (err) {
       // FAIL CLOSED: không có quyết định hợp lệ trong cache → từ chối bằng 503, không bao giờ cho qua
       this.options.logger?.warn({ err, key }, 'authorize thất bại, từ chối (fail closed)');
-      throw err instanceof DependencyUnavailableError ? err : new DependencyUnavailableError('iam-authorize');
+      throw err instanceof DependencyUnavailableError
+        ? err
+        : new DependencyUnavailableError('iam-authorize');
     }
   }
 

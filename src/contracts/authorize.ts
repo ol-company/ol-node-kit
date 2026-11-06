@@ -6,7 +6,8 @@ import { z } from 'zod';
 // Đoạn tên tài nguyên: chữ, số, chấm, gạch dưới, gạch ngang — không có "/" hay ký tự lạ
 export const RESOURCE_SEGMENT = /^[A-Za-z0-9._-]{1,128}$/;
 // Tên tài nguyên: "platform" hoặc "tenants/<id>/<loại>/<id>..."
-export const RESOURCE_PATTERN = /^(platform|tenants\/[A-Za-z0-9._-]{1,128}(\/[A-Za-z0-9._-]{1,128})*)$/;
+export const RESOURCE_PATTERN =
+  /^(platform|tenants\/[A-Za-z0-9._-]{1,128}(\/[A-Za-z0-9._-]{1,128})*)$/;
 // Định danh principal: "users/<uuid>" | "services/<clientId>" | "groups/<uuid>"
 export const PRINCIPAL_PATTERN = /^(users|services|groups)\/[A-Za-z0-9._-]{1,128}$/;
 // Permission dạng service.resource.verb, ví dụ warehouse.items.list

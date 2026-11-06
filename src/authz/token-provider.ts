@@ -51,7 +51,8 @@ export class ClientCredentialsTokenProvider implements TokenProvider {
     }
     if (!res.ok) throw new DependencyUnavailableError(`keycloak-token (HTTP ${res.status})`);
     const body = (await res.json()) as { access_token?: string; expires_in?: number };
-    if (!body.access_token) throw new DependencyUnavailableError('keycloak-token (không có access_token)');
+    if (!body.access_token)
+      throw new DependencyUnavailableError('keycloak-token (không có access_token)');
     this.cached = {
       token: body.access_token,
       expiresAt: Date.now() + (body.expires_in ?? 60) * 1_000,

@@ -12,7 +12,8 @@ import { NodeSDK } from '@opentelemetry/sdk-node';
 // Hook cho ES Modules: cho phép instrumentation "vá" các module được import
 register('@opentelemetry/instrumentation/hook.mjs', import.meta.url);
 
-const enabled = Boolean(process.env.OTEL_EXPORTER_OTLP_ENDPOINT) && process.env.OTEL_SDK_DISABLED !== 'true';
+const enabled =
+  Boolean(process.env.OTEL_EXPORTER_OTLP_ENDPOINT) && process.env.OTEL_SDK_DISABLED !== 'true';
 
 if (enabled) {
   const sdk = new NodeSDK({
@@ -32,5 +33,6 @@ if (enabled) {
   });
   sdk.start();
   // server.ts gọi hàm này khi tắt để đẩy nốt dữ liệu
-  (globalThis as { __olTelemetryShutdown?: () => Promise<void> }).__olTelemetryShutdown = () => sdk.shutdown();
+  (globalThis as { __olTelemetryShutdown?: () => Promise<void> }).__olTelemetryShutdown = () =>
+    sdk.shutdown();
 }

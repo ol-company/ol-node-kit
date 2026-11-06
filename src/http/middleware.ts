@@ -41,7 +41,13 @@ export function accessLogMiddleware(logger: Logger): RequestHandler {
 }
 
 // Phản hồi lỗi chuẩn RFC 9457 (application/problem+json)
-function problem(status: number, code: string, title: string, requestId?: string, details?: unknown) {
+function problem(
+  status: number,
+  code: string,
+  title: string,
+  requestId?: string,
+  details?: unknown,
+) {
   return {
     type: `https://errors.ol-platform.dev/${code}`,
     title,
@@ -54,7 +60,10 @@ function problem(status: number, code: string, title: string, requestId?: string
 
 export function notFoundHandler(): RequestHandler {
   return (req, res) => {
-    res.status(404).type('application/problem+json').json(problem(404, 'not_found', 'Không tìm thấy', req.requestId));
+    res
+      .status(404)
+      .type('application/problem+json')
+      .json(problem(404, 'not_found', 'Không tìm thấy', req.requestId));
   };
 }
 
@@ -63,10 +72,14 @@ export function errorHandler(logger: Logger): ErrorRequestHandler {
     if (res.headersSent) return; // Đã gửi một phần phản hồi thì không thể gửi lỗi nữa
 
     if (err instanceof AppError) {
-      if (err instanceof DependencyUnavailableError) res.setHeader('retry-after', String(err.retryAfterSeconds));
+      if (err instanceof DependencyUnavailableError)
+        res.setHeader('retry-after', String(err.retryAfterSeconds));
       const level = err.status >= 500 ? 'error' : 'info';
       logger[level]({ code: err.code, status: err.status }, err.message);
-      res.status(err.status).type('application/problem+json').json(problem(err.status, err.code, err.message, req.requestId, err.details));
+      res
+        .status(err.status)
+        .type('application/problem+json')
+        .json(problem(err.status, err.code, err.message, req.requestId, err.details));
       return;
     }
 
@@ -74,12 +87,18 @@ export function errorHandler(logger: Logger): ErrorRequestHandler {
     const e = err as { type?: string; status?: number };
     if (e?.type === 'entity.parse.failed' || e?.type === 'entity.too.large') {
       const status = e.status ?? 400;
-      res.status(status).type('application/problem+json').json(problem(status, 'invalid_body', 'Body không hợp lệ', req.requestId));
+      res
+        .status(status)
+        .type('application/problem+json')
+        .json(problem(status, 'invalid_body', 'Body không hợp lệ', req.requestId));
       return;
     }
 
     // Lỗi không lường trước: log đầy đủ, nhưng chỉ trả thông báo chung cho client
     logger.error({ err }, 'unhandled_error');
-    res.status(500).type('application/problem+json').json(problem(500, 'internal_error', 'Lỗi hệ thống', req.requestId));
+    res
+      .status(500)
+      .type('application/problem+json')
+      .json(problem(500, 'internal_error', 'Lỗi hệ thống', req.requestId));
   };
 }
