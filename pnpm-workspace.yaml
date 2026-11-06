@@ -3,3 +3,6 @@
 allowBuilds:
   esbuild: true
   protobufjs: false
+overrides:
+  gcp-metadata: ^9.2.3 # dùng gaxios 8, không còn rimraf → glob → minimatch 9
+  '@typescript-eslint/typescript-estree>minimatch': ^11.0.1
