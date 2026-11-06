@@ -10,7 +10,11 @@ export class HealthState {
 
 export type HealthCheck = () => Promise<unknown>;
 
-export function healthRouter(state: HealthState, checks: Record<string, HealthCheck> = {}, timeoutMs = 1_000): Router {
+export function healthRouter(
+  state: HealthState,
+  checks: Record<string, HealthCheck> = {},
+  timeoutMs = 1_000,
+): Router {
   const router = Router();
 
   router.get('/health/live', (_req, res) => {

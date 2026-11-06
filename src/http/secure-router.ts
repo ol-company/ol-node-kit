@@ -18,13 +18,20 @@ import './express-augment.js';
 export type RoutePolicy =
   | { kind: 'public' }
   | { kind: 'authenticated' }
-  | { kind: 'permission'; permission: string; resource: (params: Record<string, string>) => string };
+  | {
+      kind: 'permission';
+      permission: string;
+      resource: (params: Record<string, string>) => string;
+    };
 
 // Hàm tạo policy cho dễ đọc: policy.permission('warehouse.items.list', p => `tenants/${p.tenantId}`)
 export const policy = {
   public: (): RoutePolicy => ({ kind: 'public' }),
   authenticated: (): RoutePolicy => ({ kind: 'authenticated' }),
-  permission: (permission: string, resource: (params: Record<string, string>) => string): RoutePolicy => ({
+  permission: (
+    permission: string,
+    resource: (params: Record<string, string>) => string,
+  ): RoutePolicy => ({
     kind: 'permission',
     permission,
     resource,
@@ -65,7 +72,12 @@ export class SecureRouter {
     return this.add('delete', path, p, handlers);
   }
 
-  private add(method: RouteDefinition['method'], path: string, p: RoutePolicy, handlers: RequestHandler[]): this {
+  private add(
+    method: RouteDefinition['method'],
+    path: string,
+    p: RoutePolicy,
+    handlers: RequestHandler[],
+  ): this {
     this.definitions.push({ method, path, policy: p });
     const chain: RequestHandler[] = [];
     if (p.kind !== 'public') chain.push(this.authenticate);
@@ -95,7 +107,8 @@ export class SecureRouter {
         }
       }
       const resource = p.resource(req.params as Record<string, string>);
-      if (!RESOURCE_PATTERN.test(resource)) throw new ValidationError('Tên tài nguyên không hợp lệ');
+      if (!RESOURCE_PATTERN.test(resource))
+        throw new ValidationError('Tên tài nguyên không hợp lệ');
       const principal = req.principal!; // authenticate đã chạy trước
       const decision = await this.deps.authorizer.check({
         principal: principal.id,
@@ -138,7 +151,8 @@ export function handle<B = undefined, P = Record<string, string>, Q = undefined>
     const query = schemas.query ? parse(schemas.query, req.query, 'query') : (undefined as Q);
     const result = await fn({ body, params, query, principal: req.principal, req, res });
     if (res.headersSent) return;
-    if (result === undefined) res.status(204).end(); // Không có nội dung trả về
+    if (result === undefined)
+      res.status(204).end(); // Không có nội dung trả về
     else res.status(options.status ?? 200).json(result);
   };
 }
@@ -146,7 +160,10 @@ export function handle<B = undefined, P = Record<string, string>, Q = undefined>
 function parse<T>(schema: z.ZodType<T>, value: unknown, where: string): T {
   const r = schema.safeParse(value);
   if (!r.success) {
-    throw new ValidationError(`${where} không hợp lệ`, r.error.issues.map((i) => ({ path: i.path.join('.'), message: i.message })));
+    throw new ValidationError(
+      `${where} không hợp lệ`,
+      r.error.issues.map((i) => ({ path: i.path.join('.'), message: i.message })),
+    );
   }
   return r.data;
 }

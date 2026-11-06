@@ -55,7 +55,8 @@ export function startServer(options: ServerOptions): Server {
       }
     }
     // Đẩy nốt trace/metric còn trong bộ đệm của OpenTelemetry (nếu đã bật)
-    const otelShutdown = (globalThis as { __olTelemetryShutdown?: () => Promise<void> }).__olTelemetryShutdown;
+    const otelShutdown = (globalThis as { __olTelemetryShutdown?: () => Promise<void> })
+      .__olTelemetryShutdown;
     if (otelShutdown) await otelShutdown().catch(() => undefined);
 
     clearTimeout(forceExit);

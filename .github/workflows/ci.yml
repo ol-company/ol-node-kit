@@ -10,13 +10,13 @@ permissions: {}
 
 jobs:
   ci:
-    uses: ol-company/ol-build-tooling/.github/workflows/node-ci.yml@v1.0.0
+    uses: ol-company/ol-build-tooling/.github/workflows/node-ci.yml@5a241c28edd1f33f19e4144323d49395ece4aaf3 # v1.0.0
     permissions:
       contents: read
       packages: read
 
   security:
-    uses: ol-company/ol-build-tooling/.github/workflows/security-scan.yml@v1.0.0
+    uses: ol-company/ol-build-tooling/.github/workflows/security-scan.yml@5a241c28edd1f33f19e4144323d49395ece4aaf3 # v1.0.0
     permissions:
       contents: read
       security-events: write
@@ -26,7 +26,7 @@ jobs:
   release:
     if: github.event_name == 'push'
     needs: [ci, security]
-    uses: ol-company/ol-build-tooling/.github/workflows/release.yml@v1.0.0
+    uses: ol-company/ol-build-tooling/.github/workflows/release.yml@5a241c28edd1f33f19e4144323d49395ece4aaf3 # v1.0.0
     secrets: inherit
     permissions:
       contents: read
@@ -40,13 +40,13 @@ jobs:
       contents: read
       packages: write # Ghi package vào GitHub Packages của org
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           persist-credentials: false
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
           version: 10
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version-file: .node-version
           cache: pnpm
