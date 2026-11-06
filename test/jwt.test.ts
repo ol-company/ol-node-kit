@@ -1,4 +1,4 @@
-import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT } from 'jose';
+import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT, type CryptoKey } from 'jose';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { JoseTokenVerifier, UnauthenticatedError } from '../src/index.js';
 
@@ -10,7 +10,11 @@ beforeAll(async () => {
   const pair = await generateKeyPair('RS256');
   privateKey = pair.privateKey;
   const jwk = { ...(await exportJWK(pair.publicKey)), kid: 'k1', alg: 'RS256' };
-  verifier = new JoseTokenVerifier({ issuer, audience: 'ol-api', jwks: createLocalJWKSet({ keys: [jwk] }) });
+  verifier = new JoseTokenVerifier({
+    issuer,
+    audience: 'ol-api',
+    jwks: createLocalJWKSet({ keys: [jwk] }),
+  });
 });
 
 function sign(claims: Record<string, unknown>, aud = 'ol-api') {
@@ -27,11 +31,20 @@ describe('JoseTokenVerifier', () => {
   it('token người dùng → principal users/<sub>', async () => {
     const token = await sign({ sub: 'u-1', email: 'A@Acme.test', email_verified: true });
     const p = await verifier.verify(token);
-    expect(p).toMatchObject({ type: 'user', id: 'users/u-1', email: 'a@acme.test', emailVerified: true });
+    expect(p).toMatchObject({
+      type: 'user',
+      id: 'users/u-1',
+      email: 'a@acme.test',
+      emailVerified: true,
+    });
   });
 
   it('token service account → principal services/<clientId>', async () => {
-    const token = await sign({ sub: 's-1', preferred_username: 'service-account-ol-warehouse-service', azp: 'ol-warehouse-service' });
+    const token = await sign({
+      sub: 's-1',
+      preferred_username: 'service-account-ol-warehouse-service',
+      azp: 'ol-warehouse-service',
+    });
     const p = await verifier.verify(token);
     expect(p).toMatchObject({ type: 'service', id: 'services/ol-warehouse-service' });
   });
