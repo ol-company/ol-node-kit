@@ -64,10 +64,14 @@ describe('HttpAuthorizer', () => {
   });
 
   it('từ chối phản hồi sai hợp đồng', async () => {
+    // Trả Response mới mỗi lần gọi: body chỉ đọc được một lần, mà HttpAuthorizer retry lần 2
     const fetchImpl = vi
       .fn()
-      .mockResolvedValue(new Response(JSON.stringify({ allow: 'yes' }), { status: 200 }));
+      .mockImplementation(
+        async () => new Response(JSON.stringify({ allow: 'yes' }), { status: 200 }),
+      );
     const authz = new HttpAuthorizer({ baseUrl: 'http://iam', tokenProvider, fetchImpl });
     await expect(authz.check(input)).rejects.toBeInstanceOf(DependencyUnavailableError);
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
   });
 });
