@@ -1,0 +1,5 @@
+# Dependency nào được chạy script cài đặt (postinstall). Mặc định pnpm chặn hết; chỉ cho phép khi thật sự cần.
+# esbuild: do vitest dùng để biên dịch TypeScript. protobufjs: script postinstall chỉ phục vụ CLI của nó, thư viện không cần.
+allowBuilds:
+  esbuild: true
+  protobufjs: false
