@@ -10,13 +10,13 @@ permissions: {}
 
 jobs:
   ci:
-    uses: ol-company/ol-build-tooling/.github/workflows/node-ci.yml@5a241c28edd1f33f19e4144323d49395ece4aaf3 # v1.0.0
+    uses: ol-company/ol-build-tooling/.github/workflows/node-ci.yml@142fce851814e72adcd5c67e4b5d90f142ff2049 # v1.0.1
     permissions:
       contents: read
       packages: read
 
   security:
-    uses: ol-company/ol-build-tooling/.github/workflows/security-scan.yml@5a241c28edd1f33f19e4144323d49395ece4aaf3 # v1.0.0
+    uses: ol-company/ol-build-tooling/.github/workflows/security-scan.yml@142fce851814e72adcd5c67e4b5d90f142ff2049 # v1.0.1
     permissions:
       contents: read
       security-events: write
@@ -26,7 +26,7 @@ jobs:
   release:
     if: github.event_name == 'push'
     needs: [ci, security]
-    uses: ol-company/ol-build-tooling/.github/workflows/release.yml@5a241c28edd1f33f19e4144323d49395ece4aaf3 # v1.0.0
+    uses: ol-company/ol-build-tooling/.github/workflows/release.yml@142fce851814e72adcd5c67e4b5d90f142ff2049 # v1.0.1
     secrets: inherit
     permissions:
       contents: read
